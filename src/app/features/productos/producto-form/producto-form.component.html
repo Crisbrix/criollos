@@ -1,0 +1,72 @@
+<div class="producto-form-dialog">
+  <div class="dialog-header">
+    <h2>{{ isEdit ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
+    <button class="btn-close" (click)="cancelar()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="dialog-content">
+    <form>
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label>Nombre del Producto *</label>
+          <div class="input-wrapper">
+            <mat-icon>restaurant</mat-icon>
+            <input type="text" placeholder="Ej: Bandeja Paisa" [(ngModel)]="producto.nombre" name="nombre" required>
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Categoría *</label>
+          <div class="categoria-grid">
+            <button 
+              type="button"
+              class="categoria-btn" 
+              *ngFor="let cat of categorias"
+              [class.selected]="producto.categoria === cat.value"
+              (click)="producto.categoria = cat.value">
+              <mat-icon>{{cat.icon}}</mat-icon>
+              <span>{{cat.label}}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Descripción</label>
+          <div class="input-wrapper">
+            <mat-icon>description</mat-icon>
+            <textarea placeholder="Descripción del producto" [(ngModel)]="producto.descripcion" name="descripcion" rows="3"></textarea>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Precio ($) *</label>
+          <div class="input-wrapper">
+            <mat-icon>attach_money</mat-icon>
+            <input type="number" placeholder="0.00" [(ngModel)]="producto.precio" name="precio" min="0" step="0.01" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Stock *</label>
+          <div class="input-wrapper">
+            <mat-icon>inventory_2</mat-icon>
+            <input type="number" placeholder="0" [(ngModel)]="producto.stock" name="stock" min="0" required>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="dialog-actions">
+    <button class="btn-cancel" (click)="cancelar()" [disabled]="loading">
+      <mat-icon>close</mat-icon>
+      <span>Cancelar</span>
+    </button>
+    <button class="btn-save" (click)="guardar()" [disabled]="loading">
+      <mat-icon>{{ loading ? 'hourglass_empty' : 'save' }}</mat-icon>
+      <span>{{ loading ? 'Guardando...' : 'Guardar' }}</span>
+    </button>
+  </div>
+</div>

@@ -1,0 +1,110 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2>
+      <mat-icon>{{ isEditMode ? 'edit' : 'person_add' }}</mat-icon>
+      {{ isEditMode ? 'Editar Usuario' : 'Nuevo Usuario' }}
+    </h2>
+    <button class="close-btn" (click)="cancelar()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="dialog-body">
+    <form #usuarioForm="ngForm">
+      <!-- Nombre de usuario -->
+      <div class="form-group">
+        <label>Nombre de Usuario *</label>
+        <div class="input-wrapper">
+          <mat-icon>account_circle</mat-icon>
+          <input 
+            type="text" 
+            placeholder="usuario123" 
+            [(ngModel)]="nombre_usuario" 
+            name="nombre_usuario" 
+            required>
+        </div>
+      </div>
+
+      <!-- Nombre completo -->
+      <div class="form-group">
+        <label>Nombre Completo</label>
+        <div class="input-wrapper">
+          <mat-icon>badge</mat-icon>
+          <input 
+            type="text" 
+            placeholder="Juan Pérez" 
+            [(ngModel)]="nombre_completo" 
+            name="nombre_completo">
+        </div>
+      </div>
+
+      <!-- Correo -->
+      <div class="form-group">
+        <label>Correo Electrónico</label>
+        <div class="input-wrapper">
+          <mat-icon>email</mat-icon>
+          <input 
+            type="email" 
+            placeholder="usuario@ejemplo.com" 
+            [(ngModel)]="correo" 
+            name="correo">
+        </div>
+      </div>
+
+      <!-- Contraseña -->
+      <div class="form-group">
+        <label>Contraseña {{ isEditMode ? '(dejar vacío para no cambiar)' : '*' }}</label>
+        <div class="input-wrapper">
+          <mat-icon>lock</mat-icon>
+          <input 
+            [type]="hidePassword ? 'password' : 'text'" 
+            [placeholder]="isEditMode ? 'Nueva contraseña (opcional)' : 'Mínimo 6 caracteres'" 
+            [(ngModel)]="password" 
+            name="password" 
+            [required]="!isEditMode">
+          <button type="button" class="toggle-password" (click)="hidePassword = !hidePassword">
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Rol -->
+      <div class="form-group">
+        <label>Rol *</label>
+        <div class="roles-grid">
+          <label 
+            class="rol-option" 
+            *ngFor="let rol of roles"
+            [class.selected]="rol_id === rol.id">
+            <input 
+              type="radio" 
+              [(ngModel)]="rol_id" 
+              [value]="rol.id" 
+              name="rol_id">
+            <div class="option-content">
+              <mat-icon>
+                {{rol.id === 1 ? 'admin_panel_settings' : 
+                  rol.id === 2 ? 'point_of_sale' : 
+                  rol.id === 3 ? 'restaurant_menu' : 
+                  rol.id === 4 ? 'restaurant' : 'local_bar'}}
+              </mat-icon>
+              <span>{{rol.nombre}}</span>
+            </div>
+          </label>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="dialog-actions">
+    <button class="btn-cancel" (click)="cancelar()" [disabled]="loading">
+      <mat-icon>close</mat-icon>
+      <span>Cancelar</span>
+    </button>
+    <button class="btn-save" (click)="guardarUsuario()" 
+            [disabled]="loading || !nombre_usuario || (!isEditMode && !password)">
+      <mat-icon>{{ isEditMode ? 'save' : 'check' }}</mat-icon>
+      <span>{{ loading ? (isEditMode ? 'Guardando...' : 'Creando...') : (isEditMode ? 'Guardar Cambios' : 'Crear Usuario') }}</span>
+    </button>
+  </div>
+</div>

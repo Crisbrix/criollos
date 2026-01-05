@@ -1,0 +1,365 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer class="sidenav" mode="side" opened>
+    <div class="logo-container">
+      <div class="logo">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M30 15 C25 15, 20 20, 20 25 L20 45 C20 50, 25 55, 30 55 L35 55 L35 75 C35 80, 40 85, 45 85 L55 85 C60 85, 65 80, 65 75 L65 55 L70 55 C75 55, 80 50, 80 45 L80 25 C80 20, 75 15, 70 15 L30 15 Z M35 25 L45 25 L45 45 L35 45 L35 25 Z M55 25 L65 25 L65 45 L55 45 L55 25 Z"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <h2>Criollo S</h2>
+        <p>Sistema POS</p>
+      </div>
+    </div>
+    
+    <nav class="nav-menu">
+      <ng-container *ngFor="let item of menuItems">
+        <a class="nav-item" 
+           *ngIf="canShowMenuItem(item.roles)"
+           [routerLink]="item.route" 
+           routerLinkActive="active"
+           [routerLinkActiveOptions]="{exact: item.route === '/dashboard'}">
+          <mat-icon>{{item.icon}}</mat-icon>
+          <span>{{item.label}}</span>
+          <div class="nav-indicator"></div>
+        </a>
+      </ng-container>
+    </nav>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <header class="top-bar">
+      <button class="menu-toggle" (click)="drawer.toggle()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      
+      <div class="search-bar">
+        <mat-icon>search</mat-icon>
+        <input type="text" placeholder="Buscar...">
+      </div>
+      
+      <div class="user-menu">
+        <button class="user-button" [matMenuTriggerFor]="userMenu">
+          <div class="user-avatar">
+            <mat-icon>account_circle</mat-icon>
+          </div>
+          <div class="user-info">
+            <span class="user-name">{{authService.currentUser()?.nombre_completo || authService.currentUser()?.nombre_usuario}}</span>
+            <span class="user-role">{{getRoleName(authService.currentUser()?.rol_id)}}</span>
+          </div>
+          <mat-icon class="dropdown-icon">expand_more</mat-icon>
+        </button>
+        
+        <mat-menu #userMenu="matMenu" class="user-dropdown">
+          <button mat-menu-item disabled class="user-menu-header">
+            <mat-icon>badge</mat-icon>
+            <span>{{getRoleName(authService.currentUser()?.rol_id)}}</span>
+          </button>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Cerrar Sesión</span>
+          </button>
+        </mat-menu>
+      </div>
+    </header>
+
+    <div class="content">
+      <!-- Home del dashboard -->
+      <div class="dashboard-home" *ngIf="isExactDashboardRoute()">
+        <!-- Loading indicator -->
+        <mat-progress-bar *ngIf="isLoading" mode="indeterminate" class="loading-bar"></mat-progress-bar>
+
+        <div class="welcome-section">
+          <h1 class="welcome-title">¡Bienvenido, {{authService.currentUser()?.nombre_completo || authService.currentUser()?.nombre_usuario}}! 👋</h1>
+          <p class="welcome-subtitle">Resumen de operaciones del día</p>
+        </div>
+
+        <!-- Estadísticas rápidas mejoradas -->
+        <div class="stats-grid">
+          <div class="stat-card ventas" [class.loading]="isLoading">
+            <div class="stat-icon">
+              <mat-icon>trending_up</mat-icon>
+            </div>
+            <div class="stat-content">
+              <p class="stat-label">Ventas Completadas</p>
+              <h3 class="stat-value">{{stats.ventasHoy}}</h3>
+              <span class="stat-change">{{stats.ventasHoy > 0 ? 'Transacciones hoy' : 'Sin ventas aún'}}</span>
+            </div>
+          </div>
+
+          <div class="stat-card pedidos" [class.loading]="isLoading">
+            <div class="stat-icon">
+              <mat-icon>restaurant</mat-icon>
+            </div>
+            <div class="stat-content">
+              <p class="stat-label">Pedidos Activos</p>
+              <h3 class="stat-value">{{stats.pedidosActivos}}</h3>
+              <span class="stat-change">{{stats.pedidosActivos > 0 ? 'En proceso' : 'Sin pedidos'}}</span>
+            </div>
+          </div>
+
+          <div class="stat-card productos" [class.loading]="isLoading">
+            <div class="stat-icon">
+              <mat-icon>inventory_2</mat-icon>
+            </div>
+            <div class="stat-content">
+              <p class="stat-label">Productos Vendidos</p>
+              <h3 class="stat-value">{{stats.productosVendidos}}</h3>
+              <span class="stat-change">Unidades totales</span>
+            </div>
+          </div>
+
+          <div class="stat-card ingresos" [class.loading]="isLoading">
+            <div class="stat-icon">
+              <mat-icon>attach_money</mat-icon>
+            </div>
+            <div class="stat-content">
+              <p class="stat-label">Ingresos Totales</p>
+              <h3 class="stat-value">{{formatCurrency(stats.ingresoTotal)}}</h3>
+              <span class="stat-change">Ventas del día</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráficas y datos -->
+        <div class="charts-section">
+          <!-- Ventas por hora - Gráfica de líneas con área -->
+          <div class="chart-card ventas-chart">
+            <div class="chart-header">
+              <h3>Ventas por Hora</h3>
+              <span class="chart-subtitle">Distribución de ingresos</span>
+            </div>
+            <div class="chart-container">
+              <div class="line-chart-wrapper">
+                <svg class="line-chart" viewBox="0 0 800 250" preserveAspectRatio="xMidYMid meet">
+                  <!-- Líneas de grid -->
+                  <line x1="40" y1="30" x2="780" y2="30" class="grid-line" />
+                  <line x1="40" y1="85" x2="780" y2="85" class="grid-line" />
+                  <line x1="40" y1="140" x2="780" y2="140" class="grid-line" />
+                  <line x1="40" y1="195" x2="780" y2="195" class="grid-line" />
+                  
+                  <!-- Área bajo la línea -->
+                  <defs>
+                    <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" style="stop-color:#ff6b35;stop-opacity:0.3" />
+                      <stop offset="100%" style="stop-color:#ff6b35;stop-opacity:0.05" />
+                    </linearGradient>
+                  </defs>
+                  
+                  <!-- Polígono del área -->
+                  <polygon class="area-fill" 
+                    [attr.points]="getAreaPoints()"
+                    fill="url(#areaGradient)" />
+                  
+                  <!-- Línea principal -->
+                  <polyline class="line" 
+                    [attr.points]="getLinePoints()"
+                    fill="none" 
+                    stroke="#ff6b35" 
+                    stroke-width="3" 
+                    stroke-linecap="round" 
+                    stroke-linejoin="round" />
+                  
+                  <!-- Puntos en la línea -->
+                  <circle *ngFor="let value of ventasHoraData; let i = index"
+                    [attr.cx]="40 + (i * 65)"
+                    [attr.cy]="200 - (getMaxVenta() > 0 ? (value / getMaxVenta()) * 170 : 0)"
+                    r="4"
+                    class="data-point"
+                    [class.active]="value > 0" />
+                  
+                  <!-- Etiquetas X -->
+                  <text *ngFor="let label of ventasHoraLabels; let i = index"
+                    [attr.x]="40 + (i * 65)"
+                    y="225"
+                    text-anchor="middle"
+                    class="axis-label">
+                    {{label}}
+                  </text>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Productos más vendidos - Gráfica horizontal -->
+          <div class="chart-card productos-chart">
+            <div class="chart-header">
+              <h3>Top Productos</h3>
+              <span class="chart-subtitle">Más vendidos hoy</span>
+            </div>
+            <div class="chart-container">
+              <div class="products-list" *ngIf="productosPopularesLabels.length > 0">
+                <div *ngFor="let label of productosPopularesLabels; let i = index" class="product-item">
+                  <div class="product-rank">
+                    <span class="rank-number">{{i + 1}}</span>
+                  </div>
+                  <div class="product-details">
+                    <span class="product-name">{{label}}</span>
+                    <div class="product-bar-container">
+                      <div class="product-bar" [style.width.%]="getMaxProducto() > 0 ? (productosPopularesData[i] / getMaxProducto()) * 100 : 0"></div>
+                    </div>
+                  </div>
+                  <span class="product-value">{{productosPopularesData[i]}} u.</span>
+                </div>
+              </div>
+              <div class="empty-state" *ngIf="productosPopularesLabels.length === 0">
+                <mat-icon>inventory_2</mat-icon>
+                <p>Sin productos vendidos aún</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estado de mesas - Gráfica circular -->
+          <div class="chart-card mesas-chart">
+            <div class="chart-header">
+              <h3>Estado de Mesas</h3>
+              <span class="chart-subtitle">{{getTotalMesas()}} mesas totales</span>
+            </div>
+            <div class="mesas-container">
+              <div class="mesas-visual">
+                <svg class="pie-chart" viewBox="0 0 200 200">
+                  <circle cx="100" cy="100" r="80" class="pie-background" />
+                  <circle cx="100" cy="100" r="80" class="pie-segment disponible" 
+                    [style.stroke-dasharray]="getPieDasharray('disponible')"
+                    [style.stroke-dashoffset]="getPieDashoffset('disponible')" />
+                  <circle cx="100" cy="100" r="80" class="pie-segment ocupada" 
+                    [style.stroke-dasharray]="getPieDasharray('ocupada')"
+                    [style.stroke-dashoffset]="getPieDashoffset('ocupada')" />
+                  <circle cx="100" cy="100" r="80" class="pie-segment reservada" 
+                    [style.stroke-dasharray]="getPieDasharray('reservada')"
+                    [style.stroke-dashoffset]="getPieDashoffset('reservada')" />
+                  <text x="100" y="105" text-anchor="middle" class="pie-label">{{getTotalMesas()}}</text>
+                </svg>
+              </div>
+              <div class="mesas-stats">
+                <div class="mesa-stat disponible">
+                  <div class="stat-color"></div>
+                  <div class="stat-info">
+                    <h4>{{mesasEstado.disponibles}}</h4>
+                    <p>Disponibles</p>
+                  </div>
+                </div>
+                <div class="mesa-stat ocupada">
+                  <div class="stat-color"></div>
+                  <div class="stat-info">
+                    <h4>{{mesasEstado.ocupadas}}</h4>
+                    <p>Ocupadas</p>
+                  </div>
+                </div>
+                <div class="mesa-stat reservada">
+                  <div class="stat-color"></div>
+                  <div class="stat-info">
+                    <h4>{{mesasEstado.reservadas}}</h4>
+                    <p>Reservadas</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pedidos recientes - Lista mejorada -->
+          <div class="chart-card pedidos-card">
+            <div class="chart-header">
+              <h3>Pedidos Activos</h3>
+              <span class="chart-subtitle">{{pedidosRecientes.length}} pedidos en proceso</span>
+            </div>
+            <div class="pedidos-list">
+              <div *ngFor="let pedido of pedidosRecientes" class="pedido-item">
+                <div class="pedido-mesa">
+                  <mat-icon>table_restaurant</mat-icon>
+                  <span>Mesa {{pedido.mesa}}</span>
+                </div>
+                <div class="pedido-info">
+                  <span class="pedido-items">{{pedido.items}} items</span>
+                  <span class="pedido-total">{{formatCurrency(pedido.total)}}</span>
+                </div>
+                <div class="pedido-tiempo">
+                  <mat-icon>schedule</mat-icon>
+                  {{pedido.tiempo}}
+                </div>
+                <div class="pedido-estado" [ngClass]="getEstadoClass(pedido.estado)">
+                  {{pedido.estado | uppercase}}
+                </div>
+              </div>
+              <div class="empty-state" *ngIf="pedidosRecientes.length === 0">
+                <mat-icon>done_all</mat-icon>
+                <p>No hay pedidos activos</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="cards-grid">
+          <div class="dashboard-card" *ngIf="canShowMenuItem(['MESERO', 'ADMINISTRADOR', 'COCINA', 'BEBIDAS'])" routerLink="/pedidos">
+            <div class="card-icon pedidos">
+              <mat-icon>restaurant_menu</mat-icon>
+            </div>
+            <div class="card-content">
+              <h3>Pedidos</h3>
+              <p>Gestiona los pedidos de las mesas</p>
+            </div>
+            <div class="card-arrow">
+              <mat-icon>arrow_forward</mat-icon>
+            </div>
+          </div>
+
+          <div class="dashboard-card" *ngIf="canShowMenuItem(['CAJERO', 'ADMINISTRADOR'])" routerLink="/ventas">
+            <div class="card-icon ventas">
+              <mat-icon>point_of_sale</mat-icon>
+            </div>
+            <div class="card-content">
+              <h3>Ventas</h3>
+              <p>Registra y consulta ventas</p>
+            </div>
+            <div class="card-arrow">
+              <mat-icon>arrow_forward</mat-icon>
+            </div>
+          </div>
+
+          <div class="dashboard-card" *ngIf="canShowMenuItem(['ADMINISTRADOR', 'CAJERO'])" routerLink="/productos">
+            <div class="card-icon productos">
+              <mat-icon>inventory</mat-icon>
+            </div>
+            <div class="card-content">
+              <h3>Productos</h3>
+              <p>Administra el inventario</p>
+            </div>
+            <div class="card-arrow">
+              <mat-icon>arrow_forward</mat-icon>
+            </div>
+          </div>
+
+          <div class="dashboard-card" *ngIf="canShowMenuItem(['CAJERO', 'ADMINISTRADOR'])" routerLink="/reportes">
+            <div class="card-icon reportes">
+              <mat-icon>assessment</mat-icon>
+            </div>
+            <div class="card-content">
+              <h3>Reportes</h3>
+              <p>Consulta reportes y estadísticas</p>
+            </div>
+            <div class="card-arrow">
+              <mat-icon>arrow_forward</mat-icon>
+            </div>
+          </div>
+
+          <div class="dashboard-card" *ngIf="canShowMenuItem(['ADMINISTRADOR'])" routerLink="/configuracion">
+            <div class="card-icon configuracion">
+              <mat-icon>settings</mat-icon>
+            </div>
+            <div class="card-content">
+              <h3>Configuración</h3>
+              <p>Ajustes del sistema</p>
+            </div>
+            <div class="card-arrow">
+              <mat-icon>arrow_forward</mat-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Outlet para otras páginas (productos, pedidos, etc.) -->
+      <router-outlet *ngIf="hasChildRoute()"></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

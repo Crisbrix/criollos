@@ -1,0 +1,346 @@
+<div class="configuracion-container">
+  <!-- Breadcrumb Navigation -->
+  <div class="breadcrumb">
+    <a routerLink="/dashboard" class="breadcrumb-item">
+      <mat-icon>home</mat-icon>
+      <span>Dashboard</span>
+    </a>
+    <mat-icon class="breadcrumb-separator">chevron_right</mat-icon>
+    <span class="breadcrumb-item active">
+      <mat-icon>settings</mat-icon>
+      <span>Configuración</span>
+    </span>
+  </div>
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-text">
+        <div class="title-wrapper">
+          <div class="title-icon">
+            <mat-icon>settings</mat-icon>
+          </div>
+          <div class="title-content">
+            <h1>Configuración del Sistema</h1>
+            <p>
+              <mat-icon>tune</mat-icon>
+              <span>Administra la información y parámetros del restaurante</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs de configuración -->
+  <div class="config-tabs">
+    <button class="tab-button" [class.active]="tabActiva === 'general'" (click)="cambiarTab('general')">
+      <mat-icon>store</mat-icon>
+      <span>Datos Generales</span>
+    </button>
+    <button class="tab-button" [class.active]="tabActiva === 'facturacion'" (click)="cambiarTab('facturacion')">
+      <mat-icon>receipt</mat-icon>
+      <span>Facturación</span>
+    </button>
+    <button class="tab-button" [class.active]="tabActiva === 'notificaciones'" (click)="cambiarTab('notificaciones')">
+      <mat-icon>notifications</mat-icon>
+      <span>Notificaciones</span>
+    </button>
+    <button class="tab-button" [class.active]="tabActiva === 'sistema'" (click)="cambiarTab('sistema')">
+      <mat-icon>computer</mat-icon>
+      <span>Sistema</span>
+    </button>
+  </div>
+
+  <!-- Contenido de tabs -->
+  <div class="config-content">
+    <!-- Tab: Datos Generales -->
+    <div class="tab-panel" *ngIf="tabActiva === 'general'">
+      <div class="config-section">
+        <div class="section-header">
+          <mat-icon>restaurant</mat-icon>
+          <h2>Información del Restaurante</h2>
+        </div>
+        <div class="section-content">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Nombre del Restaurante</label>
+              <div class="input-wrapper">
+                <mat-icon>store</mat-icon>
+                <input type="text" placeholder="CriolloS" [(ngModel)]="config.nombre">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>RUC</label>
+              <div class="input-wrapper">
+                <mat-icon>badge</mat-icon>
+                <input type="text" placeholder="20123456789" [(ngModel)]="config.ruc">
+              </div>
+            </div>
+
+            <div class="form-group full-width">
+              <label>Dirección</label>
+              <div class="input-wrapper">
+                <mat-icon>location_on</mat-icon>
+                <input type="text" placeholder="Av. Principal 123" [(ngModel)]="config.direccion">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Teléfono</label>
+              <div class="input-wrapper">
+                <mat-icon>phone</mat-icon>
+                <input type="text" placeholder="987654321" [(ngModel)]="config.telefono">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Email</label>
+              <div class="input-wrapper">
+                <mat-icon>email</mat-icon>
+                <input type="email" placeholder="contacto@criollos.com" [(ngModel)]="config.email">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <div class="section-header">
+          <mat-icon>schedule</mat-icon>
+          <h2>Horario de Atención</h2>
+        </div>
+        <div class="section-content">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Hora de Apertura</label>
+              <div class="input-wrapper">
+                <mat-icon>access_time</mat-icon>
+                <input type="time" [(ngModel)]="config.horaApertura">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Hora de Cierre</label>
+              <div class="input-wrapper">
+                <mat-icon>access_time</mat-icon>
+                <input type="time" [(ngModel)]="config.horaCierre">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Facturación -->
+    <div class="tab-panel" *ngIf="tabActiva === 'facturacion'">
+      <div class="config-section">
+        <div class="section-header">
+          <mat-icon>receipt_long</mat-icon>
+          <h2>Parámetros de Facturación</h2>
+        </div>
+        <div class="section-content">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>IGV (%)</label>
+              <div class="input-wrapper">
+                <mat-icon>percent</mat-icon>
+                <input type="number" placeholder="18" [(ngModel)]="config.igv">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Moneda</label>
+              <div class="input-wrapper">
+                <mat-icon>attach_money</mat-icon>
+                <select [(ngModel)]="config.moneda">
+                  <option value="PEN">Soles (S/)</option>
+                  <option value="USD">Dólares ($)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Serie de Boletas</label>
+              <div class="input-wrapper">
+                <mat-icon>confirmation_number</mat-icon>
+                <input type="text" placeholder="B001" [(ngModel)]="config.serieBoleta">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Serie de Facturas</label>
+              <div class="input-wrapper">
+                <mat-icon>description</mat-icon>
+                <input type="text" placeholder="F001" [(ngModel)]="config.serieFactura">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <div class="section-header">
+          <mat-icon>print</mat-icon>
+          <h2>Configuración de Impresión</h2>
+        </div>
+        <div class="section-content">
+          <div class="toggle-group">
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <mat-icon>print</mat-icon>
+                <div>
+                  <h4>Impresión Automática</h4>
+                  <p>Imprimir tickets automáticamente al confirmar</p>
+                </div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="config.impresionAutomatica">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <mat-icon>receipt</mat-icon>
+                <div>
+                  <h4>Incluir Logo en Ticket</h4>
+                  <p>Mostrar logo del restaurante en los tickets</p>
+                </div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="config.logoEnTicket">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Notificaciones -->
+    <div class="tab-panel" *ngIf="tabActiva === 'notificaciones'">
+      <div class="config-section">
+        <div class="section-header">
+          <mat-icon>notifications_active</mat-icon>
+          <h2>Preferencias de Notificaciones</h2>
+        </div>
+        <div class="section-content">
+          <div class="toggle-group">
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <mat-icon>email</mat-icon>
+                <div>
+                  <h4>Notificaciones por Email</h4>
+                  <p>Recibir alertas y reportes por correo electrónico</p>
+                </div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="config.notifEmail">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <mat-icon>inventory</mat-icon>
+                <div>
+                  <h4>Alertas de Stock Bajo</h4>
+                  <p>Notificar cuando los productos tengan stock bajo</p>
+                </div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="config.alertaStock">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <mat-icon>trending_up</mat-icon>
+                <div>
+                  <h4>Reportes Diarios</h4>
+                  <p>Enviar resumen de ventas al final del día</p>
+                </div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="config.reporteDiario">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Sistema -->
+    <div class="tab-panel" *ngIf="tabActiva === 'sistema'">
+      <div class="config-section">
+        <div class="section-header">
+          <mat-icon>security</mat-icon>
+          <h2>Seguridad y Acceso</h2>
+        </div>
+        <div class="section-content">
+          <div class="toggle-group">
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <mat-icon>lock</mat-icon>
+                <div>
+                  <h4>Autenticación de Dos Factores</h4>
+                  <p>Requiere código adicional al iniciar sesión</p>
+                </div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="config.dobleAutenticacion">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <mat-icon>timer</mat-icon>
+                <div>
+                  <h4>Cierre de Sesión Automático</h4>
+                  <p>Cerrar sesión después de 30 minutos de inactividad</p>
+                </div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="config.cierreAutomatico">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <div class="section-header">
+          <mat-icon>backup</mat-icon>
+          <h2>Respaldo de Datos</h2>
+        </div>
+        <div class="section-content">
+          <div class="backup-info">
+            <div class="backup-card">
+              <mat-icon>cloud_upload</mat-icon>
+              <h4>Último Respaldo</h4>
+              <p>25 Oct 2025, 10:00 PM</p>
+              <button class="btn-secondary" (click)="crearRespaldo()">
+                <mat-icon>backup</mat-icon>
+                <span>Crear Respaldo Ahora</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botón guardar flotante -->
+  <div class="floating-actions">
+    <button class="btn-save" (click)="guardarConfiguracion()">
+      <mat-icon>save</mat-icon>
+      <span>Guardar Cambios</span>
+    </button>
+  </div>
+</div>

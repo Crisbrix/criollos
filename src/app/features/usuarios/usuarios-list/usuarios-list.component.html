@@ -1,0 +1,79 @@
+<div class="usuarios-container">
+  <!-- Header -->
+  <div class="page-header">
+    <h1>
+      <mat-icon>people</mat-icon>
+      Gestión de Usuarios
+    </h1>
+    <button class="btn-nuevo" (click)="nuevoUsuario()">
+      <mat-icon>add</mat-icon>
+      Nuevo Usuario
+    </button>
+  </div>
+
+  <!-- Loader -->
+  <div class="loader-container" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando usuarios...</p>
+  </div>
+
+  <!-- Grid de usuarios -->
+  <div class="usuarios-grid" *ngIf="!loading && usuarios.length > 0">
+    <div class="usuario-card" *ngFor="let usuario of usuarios">
+      <div class="usuario-header">
+        <div class="usuario-avatar">
+          <mat-icon>person</mat-icon>
+        </div>
+        <div class="usuario-info">
+          <h3>{{ usuario.nombre_completo || usuario.nombre_usuario }}</h3>
+          <p>{{ '@' + usuario.nombre_usuario }}</p>
+        </div>
+        <span class="usuario-estado" [class.activo]="usuario.activo" [class.inactivo]="!usuario.activo">
+          {{ usuario.activo ? 'Activo' : 'Inactivo' }}
+        </span>
+      </div>
+
+      <div class="usuario-body">
+        <div class="usuario-detalles">
+          <div class="detalle-item">
+            <mat-icon>badge</mat-icon>
+            <span>{{ getRoleName(usuario.rol_id) }}</span>
+          </div>
+          <div class="detalle-item" *ngIf="usuario.correo">
+            <mat-icon>email</mat-icon>
+            <span>{{ usuario.correo }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="usuario-actions">
+        <button class="btn-editar" (click)="editarUsuario(usuario)" title="Editar usuario">
+          <mat-icon>edit</mat-icon>
+          <span>Editar</span>
+        </button>
+        <button class="btn-toggle" (click)="toggleActivo(usuario)" 
+                [title]="usuario.activo ? 'Desactivar usuario' : 'Activar usuario'">
+          <mat-icon *ngIf="usuario.activo">block</mat-icon>
+          <mat-icon *ngIf="!usuario.activo">check_circle</mat-icon>
+          <span *ngIf="usuario.activo">Desactivar</span>
+          <span *ngIf="!usuario.activo">Activar</span>
+        </button>
+        <button class="btn-eliminar" (click)="eliminarUsuario(usuario)" title="Eliminar usuario">
+          <mat-icon>delete</mat-icon>
+          <span>Eliminar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estado vacío -->
+  <div class="empty-state" *ngIf="!loading && usuarios.length === 0">
+    <mat-icon>people_outline</mat-icon>
+    <h3>No hay usuarios registrados</h3>
+    <p>Comienza agregando tu primer usuario</p>
+    <button class="btn-nuevo" (click)="nuevoUsuario()">
+      <mat-icon>add</mat-icon>
+      Crear Primer Usuario
+    </button>
+  </div>
+</div>

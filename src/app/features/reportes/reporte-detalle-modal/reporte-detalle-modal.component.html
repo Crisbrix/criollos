@@ -1,0 +1,260 @@
+<div class="modal-container">
+  <div class="modal-header">
+    <h2>
+      <mat-icon>{{ tipo === 'ventas-diarias' ? 'today' : tipo === 'productos-vendidos' ? 'trending_up' : tipo === 'cierre-caja' ? 'account_balance' : 'inventory' }}</mat-icon>
+      {{ titulo }}
+    </h2>
+    <button class="close-btn" (click)="cerrar()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <!-- VENTAS DIARIAS -->
+    <div *ngIf="tipo === 'ventas-diarias' && datos" class="reporte-content">
+      <div class="info-header">
+        <div class="info-item">
+          <mat-icon>calendar_today</mat-icon>
+          <div>
+            <span class="label">Fecha</span>
+            <span class="value">{{ datos.fecha | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <mat-icon>shopping_cart</mat-icon>
+          <div>
+            <span class="label">Total Ventas</span>
+            <span class="value">{{ datos.resumen?.cantidadVentas || 0 }}</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <mat-icon>attach_money</mat-icon>
+          <div>
+            <span class="label">Ingresos</span>
+            <span class="value">${{ datos.resumen?.totalVentas || 0 | number:'1.0-0' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Hora</th>
+              <th>Mesa</th>
+              <th>Método Pago</th>
+              <th>Total</th>
+              <th>Usuario</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let venta of datos.ventas">
+              <td>#{{ venta.id }}</td>
+              <td>{{ venta.fecha_creacion | date:'HH:mm' }}</td>
+              <td>{{ venta.mesa_nombre || 'Mesa ' + venta.mesa_id }}</td>
+              <td>
+                <span class="badge" [class]="'badge-' + venta.metodo_pago.toLowerCase()">
+                  {{ venta.metodo_pago }}
+                </span>
+              </td>
+              <td class="total">${{ venta.total | number:'1.0-0' }}</td>
+              <td>{{ venta.nombre_usuario }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4"><strong>TOTAL GENERAL</strong></td>
+              <td class="total"><strong>${{ calcularTotal() | number:'1.0-0' }}</strong></td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="empty-state" *ngIf="!datos.ventas || datos.ventas.length === 0">
+        <mat-icon>receipt_long</mat-icon>
+        <p>No hay ventas registradas para este día</p>
+      </div>
+    </div>
+
+    <!-- PRODUCTOS VENDIDOS -->
+    <div *ngIf="tipo === 'productos-vendidos' && datos" class="reporte-content">
+      <div class="info-header">
+        <div class="info-item">
+          <mat-icon>inventory_2</mat-icon>
+          <div>
+            <span class="label">Total Productos</span>
+            <span class="value">{{ datos.productos?.length || 0 }}</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <mat-icon>shopping_basket</mat-icon>
+          <div>
+            <span class="label">Unidades Vendidas</span>
+            <span class="value">{{ calcularTotal() }}</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <mat-icon>attach_money</mat-icon>
+          <div>
+            <span class="label">Ingresos Totales</span>
+            <span class="value">${{ calcularTotalIngresos() | number:'1.0-0' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Producto</th>
+              <th>Precio Unit.</th>
+              <th>Cantidad</th>
+              <th>Total Ventas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let producto of datos.productos; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td><strong>{{ producto.producto.nombre }}</strong></td>
+              <td>${{ producto.producto.precio | number:'1.0-0' }}</td>
+              <td class="cantidad">{{ producto.cantidadVendida }} unidades</td>
+              <td class="total">${{ producto.totalVentas | number:'1.0-0' }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3"><strong>TOTAL GENERAL</strong></td>
+              <td class="cantidad"><strong>{{ calcularTotal() }} unidades</strong></td>
+              <td class="total"><strong>${{ calcularTotalIngresos() | number:'1.0-0' }}</strong></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="empty-state" *ngIf="!datos.productos || datos.productos.length === 0">
+        <mat-icon>inventory_2</mat-icon>
+        <p>No hay productos vendidos en este período</p>
+      </div>
+    </div>
+
+    <!-- CIERRE DE CAJA -->
+    <div *ngIf="tipo === 'cierre-caja' && datos" class="reporte-content">
+      <div class="info-header">
+        <div class="info-item">
+          <mat-icon>calendar_today</mat-icon>
+          <div>
+            <span class="label">Fecha</span>
+            <span class="value">{{ datos.fecha | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <mat-icon>receipt</mat-icon>
+          <div>
+            <span class="label">Total Ventas</span>
+            <span class="value">{{ datos.resumen?.totalVentas || 0 }}</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <mat-icon>attach_money</mat-icon>
+          <div>
+            <span class="label">Total General</span>
+            <span class="value">${{ datos.resumen?.totalGeneral || 0 | number:'1.0-0' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="metodos-pago-resumen">
+        <h3>Resumen por Método de Pago</h3>
+        <div class="metodos-grid">
+          <div class="metodo-card efectivo">
+            <mat-icon>payments</mat-icon>
+            <div class="metodo-info">
+              <span class="metodo-nombre">Efectivo</span>
+              <span class="metodo-total">${{ getMetodoPagoTotal('efectivo') | number:'1.0-0' }}</span>
+            </div>
+          </div>
+          <div class="metodo-card tarjeta">
+            <mat-icon>credit_card</mat-icon>
+            <div class="metodo-info">
+              <span class="metodo-nombre">Tarjeta</span>
+              <span class="metodo-total">${{ getMetodoPagoTotal('tarjeta') | number:'1.0-0' }}</span>
+            </div>
+          </div>
+          <div class="metodo-card transferencia">
+            <mat-icon>account_balance</mat-icon>
+            <div class="metodo-info">
+              <span class="metodo-nombre">Transferencia</span>
+              <span class="metodo-total">${{ getMetodoPagoTotal('transferencia') | number:'1.0-0' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVENTARIO -->
+    <div *ngIf="tipo === 'inventario' && datos" class="reporte-content">
+      <div class="info-header">
+        <div class="info-item">
+          <mat-icon>inventory</mat-icon>
+          <div>
+            <span class="label">Total Productos</span>
+            <span class="value">{{ datos.resumen?.totalProductos || 0 }}</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <mat-icon>attach_money</mat-icon>
+          <div>
+            <span class="label">Valor Total</span>
+            <span class="value">${{ datos.resumen?.valorTotal || 0 | number:'1.0-0' }}</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <mat-icon>warning</mat-icon>
+          <div>
+            <span class="label">Stock Bajo</span>
+            <span class="value">{{ datos.resumen?.productosStockBajo || 0 }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Producto</th>
+              <th>Precio</th>
+              <th>Stock</th>
+              <th>Valor</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let producto of datos.productos" [class.stock-bajo]="producto.stock < 10">
+              <td>#{{ producto.id }}</td>
+              <td><strong>{{ producto.nombre }}</strong></td>
+              <td>${{ producto.precio | number:'1.0-0' }}</td>
+              <td>{{ producto.stock }}</td>
+              <td>${{ (producto.precio * producto.stock) | number:'1.0-0' }}</td>
+              <td>
+                <span class="badge" [class.badge-warning]="producto.stock < 10" [class.badge-success]="producto.stock >= 10">
+                  {{ producto.stock < 10 ? '⚠️ Bajo' : '✅ OK' }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn-cerrar" (click)="cerrar()">
+      <mat-icon>close</mat-icon>
+      <span>Cerrar</span>
+    </button>
+  </div>
+</div>

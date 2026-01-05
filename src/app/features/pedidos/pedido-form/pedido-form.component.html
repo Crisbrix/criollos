@@ -1,0 +1,181 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2>
+      <mat-icon>{{ modo === 'adicionar' ? 'add_circle' : 'restaurant_menu' }}</mat-icon>
+      {{ modo === 'adicionar' ? 'Adicionar al Pedido' : 'Nuevo Pedido' }}
+      <span class="paso-indicator" *ngIf="paso === 2 && modo === 'nuevo'">- Paso 2 de 2</span>
+      <span class="mesa-info" *ngIf="modo === 'adicionar' && pedidoExistente">
+        - Mesa {{ pedidoExistente.mesa_nombre || pedidoExistente.mesa_id }}
+      </span>
+    </h2>
+    <button class="close-btn" (click)="cancelar()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="dialog-body">
+    <!-- PASO 1: Seleccionar Mesa -->
+    <div class="paso-mesas" *ngIf="paso === 1">
+      <div class="paso-header">
+        <h3>{{ modo === 'adicionar' ? 'Selecciona la Mesa para Adicionar' : 'Selecciona una Mesa' }}</h3>
+        <p>{{ modo === 'adicionar' ? 'Mesas con pedidos activos' : 'Mesas libres disponibles' }}</p>
+      </div>
+
+      <!-- Loading Spinner -->
+      <div class="loading-container" *ngIf="loadingMesas">
+        <div class="spinner">
+          <mat-icon class="spinner-icon">hourglass_empty</mat-icon>
+        </div>
+        <p class="loading-text">Cargando mesas disponibles...</p>
+      </div>
+
+      <!-- Mesas Grid -->
+      <div class="mesas-grid" *ngIf="!loadingMesas">
+        <div 
+          class="mesa-card" 
+          [class.ocupada]="modo === 'adicionar'"
+          *ngFor="let mesa of mesasDisponibles"
+          (click)="seleccionarMesa(mesa)">
+          <div class="mesa-icon">
+            <mat-icon>table_restaurant</mat-icon>
+          </div>
+          <div class="mesa-info">
+            <h4>{{mesa.nombre}}</h4>
+            <span class="capacidad" *ngIf="modo === 'nuevo'">
+              <mat-icon>people</mat-icon>
+              {{mesa.cantidad_personas}} personas
+            </span>
+            <span class="pedido-info" *ngIf="modo === 'adicionar' && mesa.pedido">
+              <mat-icon>receipt</mat-icon>
+              ${{mesa.pedido.total | number:'1.0-0'}} - {{mesa.pedido.detalles?.length || 0}} items
+            </span>
+          </div>
+          <div class="mesa-action">
+            <mat-icon>{{ modo === 'adicionar' ? 'add_circle' : 'arrow_forward' }}</mat-icon>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!loadingMesas && mesasDisponibles.length === 0">
+        <mat-icon>{{ modo === 'adicionar' ? 'receipt_long' : 'table_restaurant' }}</mat-icon>
+        <p>{{ modo === 'adicionar' ? 'No hay mesas con pedidos activos' : 'No hay mesas libres' }}</p>
+      </div>
+    </div>
+
+    <!-- PASO 2: Seleccionar Productos -->
+    <form #pedidoForm="ngForm" *ngIf="paso === 2">
+      <!-- Botón volver -->
+      <button type="button" class="btn-volver" (click)="volverAMesas()">
+        <mat-icon>arrow_back</mat-icon>
+        <span>Cambiar Mesa</span>
+      </button>
+
+      <!-- Mesa seleccionada -->
+      <div class="mesa-seleccionada">
+        <mat-icon>table_restaurant</mat-icon>
+        <span>Mesa {{mesa_id}}</span>
+      </div>
+
+      <div class="form-row">
+
+        <div class="form-group full-width">
+          <label>Observaciones</label>
+          <div class="input-wrapper">
+            <mat-icon>note</mat-icon>
+            <textarea 
+              placeholder="Observaciones del pedido" 
+              [(ngModel)]="observaciones" 
+              name="observaciones" 
+              rows="2">
+            </textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Productos Disponibles -->
+      <div class="productos-section">
+        <h3>Productos Disponibles</h3>
+        <div class="productos-grid">
+          <div 
+            class="producto-card" 
+            *ngFor="let producto of productosDisponibles"
+            [class.sin-stock]="producto.stock <= 0"
+            (click)="agregarProducto(producto)">
+            <mat-icon>add_circle</mat-icon>
+            <div class="producto-info">
+              <span class="producto-nombre">{{producto.nombre}}</span>
+              <div class="producto-detalles">
+                <span class="producto-precio">${{producto.precio | number:'1.2-2'}}</span>
+                <span class="producto-stock" [class.bajo-stock]="producto.stock < 10">
+                  <mat-icon>inventory_2</mat-icon>
+                  Stock: {{producto.stock}}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Productos Seleccionados -->
+      <div class="seleccionados-section" *ngIf="productosSeleccionados.length > 0">
+        <h3>Productos del Pedido</h3>
+        <div class="seleccionados-list">
+          <div class="seleccionado-item" *ngFor="let item of productosSeleccionados; let i = index">
+            <div class="item-info">
+              <span class="item-nombre">{{item.nombre}}</span>
+              <span class="item-precio">${{item.precio | number:'1.2-2'}}</span>
+            </div>
+            
+            <div class="item-cantidad">
+              <button type="button" class="btn-cantidad" (click)="cambiarCantidad(item, -1)">
+                <mat-icon>remove</mat-icon>
+              </button>
+              <span>{{item.cantidad}}</span>
+              <button type="button" class="btn-cantidad" (click)="cambiarCantidad(item, 1)">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+
+            <div class="item-subtotal">
+              ${{(item.precio * item.cantidad) | number:'1.2-2'}}
+            </div>
+
+            <button type="button" class="btn-eliminar" (click)="eliminarProducto(i)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="observaciones-section">
+          <label for="observaciones">
+            <mat-icon>description</mat-icon>
+            Observaciones del Pedido
+          </label>
+          <textarea 
+            id="observaciones"
+            [(ngModel)]="observaciones" 
+            name="observaciones"
+            placeholder="Ej: Sin cebolla, extra picante, etc."
+            rows="3"></textarea>
+        </div>
+
+        <div class="total-section">
+          <span class="total-label">Total:</span>
+          <span class="total-value">${{calcularTotal() | number:'1.2-2'}}</span>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="dialog-actions">
+    <button class="btn-cancel" (click)="cancelar()" [disabled]="loading">
+      <mat-icon>close</mat-icon>
+      <span>Cancelar</span>
+    </button>
+    <button class="btn-save" (click)="guardar()" [disabled]="loading || productosSeleccionados.length === 0">
+      <mat-icon>check</mat-icon>
+      <span>{{ loading ? 'Guardando...' : 'Crear Pedido' }}</span>
+    </button>
+  </div>
+</div>

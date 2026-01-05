@@ -1,0 +1,122 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2>
+      <mat-icon>table_restaurant</mat-icon>
+      {{ isEdit ? 'Editar Mesa' : 'Nueva Mesa' }}
+    </h2>
+    <button class="close-btn" (click)="cancelar()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="dialog-body">
+    <form #mesaForm="ngForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nombre de la Mesa *</label>
+          <div class="input-wrapper">
+            <mat-icon>label</mat-icon>
+            <input 
+              type="text" 
+              placeholder="Ej: Mesa 1" 
+              [(ngModel)]="mesa.nombre" 
+              name="nombre" 
+              required
+              maxlength="50">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Capacidad (personas) *</label>
+          <div class="input-wrapper">
+            <mat-icon>people</mat-icon>
+            <input 
+              type="number" 
+              placeholder="4" 
+              [(ngModel)]="mesa.cantidad_personas" 
+              name="cantidad_personas" 
+              min="1"
+              max="20"
+              required>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group full-width">
+          <label>Estado *</label>
+          <div class="estado-options">
+            <label class="estado-option" [class.selected]="mesa.estado === 'libre'">
+              <input 
+                type="radio" 
+                [(ngModel)]="mesa.estado" 
+                name="estado" 
+                value="libre">
+              <div class="option-content libre">
+                <mat-icon>check_circle</mat-icon>
+                <span>Libre</span>
+              </div>
+            </label>
+
+            <label class="estado-option" [class.selected]="mesa.estado === 'ocupada'">
+              <input 
+                type="radio" 
+                [(ngModel)]="mesa.estado" 
+                name="estado" 
+                value="ocupada">
+              <div class="option-content ocupada">
+                <mat-icon>restaurant</mat-icon>
+                <span>Ocupada</span>
+              </div>
+            </label>
+
+            <label class="estado-option" [class.selected]="mesa.estado === 'reservada'">
+              <input 
+                type="radio" 
+                [(ngModel)]="mesa.estado" 
+                name="estado" 
+                value="reservada">
+              <div class="option-content reservada">
+                <mat-icon>schedule</mat-icon>
+                <span>Reservada</span>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="mesa-preview">
+        <h3>Vista Previa</h3>
+        <div class="preview-card" [class]="'estado-' + mesa.estado">
+          <div class="preview-icon">
+            <mat-icon>
+              {{ mesa.estado === 'libre' ? 'check_circle' : mesa.estado === 'ocupada' ? 'restaurant' : 'schedule' }}
+            </mat-icon>
+          </div>
+          <div class="preview-info">
+            <h4>{{ mesa.nombre || 'Nombre de la mesa' }}</h4>
+            <div class="preview-details">
+              <span class="capacidad">
+                <mat-icon>people</mat-icon>
+                {{ mesa.cantidad_personas }} personas
+              </span>
+              <span class="estado-badge">{{ mesa.estado | titlecase }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="dialog-actions">
+    <button class="btn-cancel" (click)="cancelar()" [disabled]="loading">
+      <mat-icon>close</mat-icon>
+      <span>Cancelar</span>
+    </button>
+    <button class="btn-save" (click)="guardar()" [disabled]="loading || !mesaForm.valid">
+      <mat-icon>check</mat-icon>
+      <span>{{ loading ? 'Guardando...' : (isEdit ? 'Actualizar' : 'Crear Mesa') }}</span>
+    </button>
+  </div>
+</div>

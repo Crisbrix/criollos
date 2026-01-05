@@ -1,0 +1,114 @@
+<div class="mesas-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="header-icon">
+        <mat-icon>table_restaurant</mat-icon>
+      </div>
+      <div class="header-text">
+        <h1>Gestión de Mesas</h1>
+        <p>
+          <mat-icon>info</mat-icon>
+          Visualiza el estado de todas las mesas del restaurante
+        </p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-primary" (click)="nuevaMesa()">
+        <mat-icon>add</mat-icon>
+        <span>Nueva Mesa</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Estadísticas -->
+  <div class="stats-cards">
+    <div class="stat-card libre">
+      <mat-icon>check_circle</mat-icon>
+      <div class="stat-info">
+        <span class="stat-value">{{getMesasLibres()}}</span>
+        <span class="stat-label">Mesas Libres</span>
+      </div>
+    </div>
+
+    <div class="stat-card ocupada">
+      <mat-icon>restaurant</mat-icon>
+      <div class="stat-info">
+        <span class="stat-value">{{getMesasOcupadas()}}</span>
+        <span class="stat-label">Mesas Ocupadas</span>
+      </div>
+    </div>
+
+    <div class="stat-card reservada">
+      <mat-icon>schedule</mat-icon>
+      <div class="stat-info">
+        <span class="stat-value">{{getMesasReservadas()}}</span>
+        <span class="stat-label">Mesas Reservadas</span>
+      </div>
+    </div>
+
+    <div class="stat-card total">
+      <mat-icon>table_bar</mat-icon>
+      <div class="stat-info">
+        <span class="stat-value">{{mesas.length}}</span>
+        <span class="stat-label">Total Mesas</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loader-container" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando mesas...</p>
+  </div>
+
+  <!-- Grid de Mesas -->
+  <div class="mesas-grid" *ngIf="!loading">
+    <div 
+      class="mesa-card" 
+      *ngFor="let mesa of mesas"
+      [class]="getEstadoClass(mesa.estado)"
+      (click)="verDetalleMesa(mesa)">
+      
+      <div class="mesa-icon">
+        <mat-icon>{{getEstadoIcon(mesa.estado)}}</mat-icon>
+      </div>
+
+      <div class="mesa-info">
+        <h3>{{mesa.nombre}}</h3>
+        <div class="mesa-detalles">
+          <span class="capacidad">
+            <mat-icon>people</mat-icon>
+            {{mesa.cantidad_personas}} personas
+          </span>
+          <span class="estado-badge" [class]="getEstadoClass(mesa.estado)">
+            {{mesa.estado | titlecase}}
+          </span>
+        </div>
+      </div>
+
+      <div class="mesa-pedido" *ngIf="mesa.pedido_activo">
+        <div class="pedido-info">
+          <span class="pedido-items">
+            <mat-icon>restaurant_menu</mat-icon>
+            {{mesa.pedido_activo.items}} items
+          </span>
+          <span class="pedido-total">
+            ${{mesa.pedido_activo.total | number:'1.0-0'}}
+          </span>
+        </div>
+      </div>
+
+      <div class="mesa-action">
+        <mat-icon>arrow_forward</mat-icon>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!loading && mesas.length === 0">
+    <mat-icon>table_restaurant</mat-icon>
+    <h3>No hay mesas registradas</h3>
+    <p>Agrega mesas para comenzar a gestionar tu restaurante</p>
+  </div>
+</div>

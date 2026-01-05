@@ -1,0 +1,127 @@
+<div class="cocina-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="header-icon">
+        <mat-icon>restaurant</mat-icon>
+      </div>
+      <div class="header-text">
+        <h1>Vista de Cocina</h1>
+        <p>
+          <mat-icon>info</mat-icon>
+          Gestiona los pedidos en preparación
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estadísticas -->
+  <div class="stats-cards">
+    <div class="stat-card nuevos">
+      <mat-icon>fiber_new</mat-icon>
+      <div class="stat-info">
+        <span class="stat-value">{{getPedidosNuevos()}}</span>
+        <span class="stat-label">Pedidos Nuevos</span>
+      </div>
+    </div>
+
+    <div class="stat-card preparando">
+      <mat-icon>restaurant_menu</mat-icon>
+      <div class="stat-info">
+        <span class="stat-value">{{getPedidosPreparando()}}</span>
+        <span class="stat-label">En Preparación</span>
+      </div>
+    </div>
+
+    <div class="stat-card total">
+      <mat-icon>receipt_long</mat-icon>
+      <div class="stat-info">
+        <span class="stat-value">{{pedidos.length}}</span>
+        <span class="stat-label">Total Activos</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loader-container" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando pedidos...</p>
+  </div>
+
+  <!-- Grid de Pedidos -->
+  <div class="pedidos-grid" *ngIf="!loading && pedidos.length > 0">
+    <div 
+      class="pedido-card" 
+      *ngFor="let pedido of pedidos"
+      [class]="getEstadoClass(pedido.estado)">
+      
+      <!-- Header del pedido -->
+      <div class="pedido-header">
+        <div class="pedido-mesa">
+          <mat-icon>table_restaurant</mat-icon>
+          <span>{{pedido.mesa_nombre || 'Mesa ' + pedido.mesa_id}}</span>
+        </div>
+        <div class="pedido-tiempo">
+          <mat-icon>schedule</mat-icon>
+          <span>{{getTiempoTranscurrido(pedido.fecha_creacion)}}</span>
+        </div>
+      </div>
+
+      <!-- Estado -->
+      <div class="pedido-estado" [class]="getEstadoClass(pedido.estado)">
+        {{getEstadoLabel(pedido.estado)}}
+      </div>
+
+      <!-- Productos -->
+      <div class="pedido-productos">
+        <h4>
+          <mat-icon>restaurant</mat-icon>
+          Productos:
+        </h4>
+        <div class="producto-item" *ngFor="let detalle of pedido.detalles">
+          <span class="cantidad">{{detalle.cantidad}}x</span>
+          <span class="nombre">{{detalle.producto_nombre}}</span>
+          <span class="notas" *ngIf="detalle.notas">
+            <mat-icon>note</mat-icon>
+            {{detalle.notas}}
+          </span>
+        </div>
+      </div>
+
+      <!-- Observaciones del Pedido -->
+      <div class="pedido-observaciones" *ngIf="pedido.observaciones">
+        <div class="observaciones-header">
+          <mat-icon>description</mat-icon>
+          <strong>Observaciones:</strong>
+        </div>
+        <p>{{pedido.observaciones}}</p>
+      </div>
+
+      <!-- Acciones -->
+      <div class="pedido-acciones">
+        <button 
+          *ngIf="pedido.estado === 'abierto'"
+          class="btn-preparar"
+          (click)="cambiarEstado(pedido, 'enviado_cocina')">
+          <mat-icon>restaurant_menu</mat-icon>
+          <span>Iniciar Preparación</span>
+        </button>
+
+        <button 
+          *ngIf="pedido.estado === 'enviado_cocina'"
+          class="btn-entregar"
+          (click)="cambiarEstado(pedido, 'listo')">
+          <mat-icon>check_circle</mat-icon>
+          <span>Marcar como Listo</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!loading && pedidos.length === 0">
+    <mat-icon>restaurant</mat-icon>
+    <h3>No hay pedidos activos</h3>
+    <p>Los nuevos pedidos aparecerán aquí automáticamente</p>
+  </div>
+</div>

@@ -1,0 +1,169 @@
+<div class="ventas-container">
+  <!-- Breadcrumb Navigation -->
+  <div class="breadcrumb">
+    <a routerLink="/dashboard" class="breadcrumb-item">
+      <mat-icon>home</mat-icon>
+      <span>Dashboard</span>
+    </a>
+    <mat-icon class="breadcrumb-separator">chevron_right</mat-icon>
+    <span class="breadcrumb-item active">
+      <mat-icon>point_of_sale</mat-icon>
+      <span>Ventas</span>
+    </span>
+  </div>
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-text">
+        <div class="title-wrapper">
+          <div class="title-icon">
+            <mat-icon>point_of_sale</mat-icon>
+          </div>
+          <div class="title-content">
+            <h1>Gestión de Ventas</h1>
+            <p>
+              <mat-icon>receipt_long</mat-icon>
+              <span>Registra y consulta todas las ventas del restaurante</span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <button class="btn-nuevo" (click)="nuevaVenta()">
+        <div class="btn-icon-wrapper">
+          <mat-icon>add</mat-icon>
+        </div>
+        <span class="btn-text">Nueva Venta</span>
+        <div class="btn-shine"></div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Estadísticas rápidas -->
+  <div class="stats-row">
+    <div class="stat-item ventas">
+      <mat-icon>shopping_cart</mat-icon>
+      <div class="stat-info">
+        <span class="stat-value">{{ventas.length}}</span>
+        <span class="stat-label">Ventas Hoy</span>
+      </div>
+    </div>
+    <div class="stat-item ingresos">
+      <mat-icon>attach_money</mat-icon>
+      <div class="stat-info">
+        <span class="stat-value">${{getTotalIngresos() | number:'1.0-0'}}</span>
+        <span class="stat-label">Ingresos Totales</span>
+      </div>
+    </div>
+    <div class="stat-item efectivo">
+      <mat-icon>payments</mat-icon>
+      <div class="stat-info">
+        <span class="stat-value">{{getVentasPorMetodo('efectivo').length}}</span>
+        <span class="stat-label">Efectivo</span>
+      </div>
+    </div>
+    <div class="stat-item tarjeta">
+      <mat-icon>credit_card</mat-icon>
+      <div class="stat-info">
+        <span class="stat-value">{{getVentasPorMetodo('tarjeta').length}}</span>
+        <span class="stat-label">Tarjeta</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters-section">
+    <div class="filter-chips">
+      <button class="filter-chip" [class.active]="filtroMetodo === 'TODOS'" (click)="filtrarPorMetodo('TODOS')">
+        <mat-icon>payments</mat-icon>
+        <span>Todos</span>
+      </button>
+      <button class="filter-chip" [class.active]="filtroMetodo === 'efectivo'" (click)="filtrarPorMetodo('efectivo')">
+        <mat-icon>money</mat-icon>
+        <span>Efectivo</span>
+      </button>
+      <button class="filter-chip" [class.active]="filtroMetodo === 'tarjeta'" (click)="filtrarPorMetodo('tarjeta')">
+        <mat-icon>credit_card</mat-icon>
+        <span>Tarjeta</span>
+      </button>
+      <button class="filter-chip" [class.active]="filtroMetodo === 'transferencia'" (click)="filtrarPorMetodo('transferencia')">
+        <mat-icon>account_balance</mat-icon>
+        <span>Transferencia</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loader-container" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando ventas...</p>
+  </div>
+
+  <!-- Grid de ventas -->
+  <div class="ventas-grid" *ngIf="!loading && ventasFiltradas.length > 0">
+    <div class="venta-card" *ngFor="let venta of ventasFiltradas">
+      <div class="venta-header">
+        <div class="venta-numero">
+          <mat-icon>receipt</mat-icon>
+          <span>#{{venta.id}}</span>
+        </div>
+        <span class="venta-estado" [class.completada]="venta.estado === 'completada'" [class.cancelada]="venta.estado === 'cancelada'">
+          {{venta.estado}}
+        </span>
+      </div>
+
+      <div class="venta-info">
+        <div class="info-row">
+          <mat-icon>schedule</mat-icon>
+          <span>{{venta.fecha_creacion | date:'short'}}</span>
+        </div>
+        <div class="info-row">
+          <mat-icon>person</mat-icon>
+          <span>{{venta.nombre_completo || venta.nombre_usuario}}</span>
+        </div>
+        <div class="info-row metodo" [class]="getMetodoClass(venta.metodo_pago)">
+          <mat-icon>{{getMetodoIcon(venta.metodo_pago)}}</mat-icon>
+          <span>{{venta.metodo_pago}}</span>
+        </div>
+      </div>
+
+      <div class="venta-productos" *ngIf="venta.detalles && venta.detalles.length > 0">
+        <h4>Productos ({{venta.detalles.length}})</h4>
+        <div class="producto-item" *ngFor="let detalle of venta.detalles.slice(0, 3)">
+          <span class="cantidad">{{detalle.cantidad}}x</span>
+          <span class="nombre">{{detalle.producto_nombre}}</span>
+          <span class="precio">${{detalle.subtotal | number:'1.2-2'}}</span>
+        </div>
+        <span class="ver-mas" *ngIf="venta.detalles.length > 3">+{{venta.detalles.length - 3}} más...</span>
+      </div>
+
+      <div class="venta-footer">
+        <div class="venta-total">
+          <span class="total-label">Total</span>
+          <span class="total-value">${{venta.total | number:'1.2-2'}}</span>
+        </div>
+        <div class="venta-actions">
+          <button class="btn-action view" (click)="verDetalle(venta)">
+            <mat-icon>visibility</mat-icon>
+          </button>
+          <button class="btn-action print" (click)="imprimirTicket(venta)">
+            <mat-icon>print</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-state" *ngIf="!loading && ventasFiltradas.length === 0">
+    <div class="empty-icon">
+      <mat-icon>point_of_sale</mat-icon>
+    </div>
+    <h3>No hay ventas</h3>
+    <p>{{ventas.length === 0 ? 'Comienza registrando tu primera venta' : 'No se encontraron ventas con ese filtro'}}</p>
+    <button class="btn-nuevo" (click)="nuevaVenta()">
+      <mat-icon>add_circle</mat-icon>
+      <span>Registrar Venta</span>
+    </button>
+  </div>
+</div>

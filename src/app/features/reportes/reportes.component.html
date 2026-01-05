@@ -1,0 +1,220 @@
+<div class="reportes-container">
+  <!-- Breadcrumb Navigation -->
+  <div class="breadcrumb">
+    <a routerLink="/dashboard" class="breadcrumb-item">
+      <mat-icon>home</mat-icon>
+      <span>Dashboard</span>
+    </a>
+    <mat-icon class="breadcrumb-separator">chevron_right</mat-icon>
+    <span class="breadcrumb-item active">
+      <mat-icon>assessment</mat-icon>
+      <span>Reportes</span>
+    </span>
+  </div>
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-text">
+        <div class="title-wrapper">
+          <div class="title-icon">
+            <mat-icon>assessment</mat-icon>
+          </div>
+          <div class="title-content">
+            <h1>Reportes y Estadísticas</h1>
+            <p>
+              <mat-icon>analytics</mat-icon>
+              <span>Análisis completo del rendimiento del restaurante</span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-export" (click)="exportarTodo()">
+          <mat-icon>file_download</mat-icon>
+          <span>Exportar Todo</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtros de fecha -->
+  <div class="filters-section">
+    <div class="filter-chips">
+      <button class="filter-chip" [class.active]="periodo === 'HOY'" (click)="cambiarPeriodo('HOY')">
+        <mat-icon>today</mat-icon>
+        <span>Hoy</span>
+      </button>
+      <button class="filter-chip" [class.active]="periodo === 'SEMANA'" (click)="cambiarPeriodo('SEMANA')">
+        <mat-icon>date_range</mat-icon>
+        <span>Esta Semana</span>
+      </button>
+      <button class="filter-chip" [class.active]="periodo === 'MES'" (click)="cambiarPeriodo('MES')">
+        <mat-icon>calendar_month</mat-icon>
+        <span>Este Mes</span>
+      </button>
+      <button class="filter-chip" [class.active]="periodo === 'ANIO'" (click)="cambiarPeriodo('ANIO')">
+        <mat-icon>calendar_today</mat-icon>
+        <span>Este Año</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Estadísticas principales -->
+  <div class="stats-grid">
+    <div class="stat-card ventas">
+      <div class="stat-header">
+        <mat-icon>shopping_cart</mat-icon>
+      </div>
+      <div class="stat-content">
+        <h3>{{estadisticas.totalVentas}}</h3>
+        <p>Total Ventas Hoy</p>
+      </div>
+    </div>
+
+    <div class="stat-card ingresos">
+      <div class="stat-header">
+        <mat-icon>attach_money</mat-icon>
+      </div>
+      <div class="stat-content">
+        <h3>${{estadisticas.ingresoTotal | number:'1.0-0'}}</h3>
+        <p>Ingresos Totales Hoy</p>
+      </div>
+    </div>
+
+    <div class="stat-card promedio">
+      <div class="stat-header">
+        <mat-icon>trending_up</mat-icon>
+      </div>
+      <div class="stat-content">
+        <h3>${{estadisticas.ticketPromedio | number:'1.0-0'}}</h3>
+        <p>Ticket Promedio</p>
+      </div>
+    </div>
+
+    <div class="stat-card productos">
+      <div class="stat-header">
+        <mat-icon>inventory_2</mat-icon>
+        <span class="stat-badge">{{estadisticas.productosVendidos}} unidades</span>
+      </div>
+      <div class="stat-content">
+        <h3>{{estadisticas.productosMasVendido || 'Sin ventas'}}</h3>
+        <p>Producto Más Vendido</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráficas -->
+  <div class="charts-section">
+    <!-- Ventas por día -->
+    <div class="chart-card full-width">
+      <div class="chart-header">
+        <h3>Ventas por Día</h3>
+        <span class="chart-subtitle">Últimos 7 días</span>
+      </div>
+      <div class="chart-container">
+        <div class="line-chart">
+          <div class="chart-lines">
+            <div *ngFor="let valor of ventasPorDia; let i = index" class="line-point">
+              <div class="point" [style.bottom.%]="(valor / getMaxVentas()) * 100">
+                <span class="point-value">${{valor}}</span>
+              </div>
+              <span class="point-label">{{diasSemana[i]}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ventas por método de pago -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Métodos de Pago</h3>
+        <span class="chart-subtitle">Distribución</span>
+      </div>
+      <div class="chart-container">
+        <div class="donut-chart" [class.all-zero]="getMetodosPagoAllZero()">
+          <div class="donut-segments" [style.background]="getDonutBackground()">
+            <div class="donut-center">
+              <span class="donut-center-title">Total</span>
+              <span class="donut-center-value">{{metodosPago.efectivo + metodosPago.tarjeta + metodosPago.transferencia}}%</span>
+            </div>
+          </div>
+
+          <div class="donut-legend">
+            <div class="legend-item">
+              <div class="legend-row">
+                <span class="legend-color efectivo"></span>
+                <span>Efectivo ({{metodosPago.efectivo}}%)</span>
+              </div>
+              <div class="legend-bar">
+                <div class="legend-bar-fill efectivo" [style.width.%]="metodosPago.efectivo"></div>
+              </div>
+            </div>
+            <div class="legend-item">
+              <div class="legend-row">
+                <span class="legend-color tarjeta"></span>
+                <span>Tarjeta ({{metodosPago.tarjeta}}%)</span>
+              </div>
+              <div class="legend-bar">
+                <div class="legend-bar-fill tarjeta" [style.width.%]="metodosPago.tarjeta"></div>
+              </div>
+            </div>
+            <div class="legend-item">
+              <div class="legend-row">
+                <span class="legend-color transferencia"></span>
+                <span>Transferencia ({{metodosPago.transferencia}}%)</span>
+              </div>
+              <div class="legend-bar">
+                <div class="legend-bar-fill transferencia" [style.width.%]="metodosPago.transferencia"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top productos -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Top 5 Productos</h3>
+        <span class="chart-subtitle">Más vendidos</span>
+      </div>
+      <div class="chart-container">
+        <div class="ranking-list">
+          <div *ngFor="let producto of topProductos; let i = index" class="ranking-item">
+            <span class="ranking-position">#{{i + 1}}</span>
+            <div class="ranking-info">
+              <span class="ranking-name">{{producto.nombre}}</span>
+              <div class="ranking-bar">
+                <div class="bar-fill" [style.width.%]="(producto.cantidad / topProductos[0].cantidad) * 100"></div>
+              </div>
+            </div>
+            <span class="ranking-value">{{producto.cantidad}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reportes Detallados -->
+  <div class="reportes-section">
+    <h2>Reportes Detallados</h2>
+    <p class="section-description">Haz clic en cada reporte para ver información detallada</p>
+    <div class="reportes-grid">
+      <div class="reporte-card" *ngFor="let reporte of reportes" (click)="generarReporte(reporte.ruta)">
+        <div class="reporte-icon" [class]="reporte.clase">
+          <mat-icon>{{reporte.icono}}</mat-icon>
+        </div>
+        <div class="reporte-content">
+          <h3>{{reporte.titulo}}</h3>
+          <p>{{reporte.descripcion}}</p>
+        </div>
+        <div class="btn-ver">
+          <mat-icon>visibility</mat-icon>
+          <span>Ver Detalles</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

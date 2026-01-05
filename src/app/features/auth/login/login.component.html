@@ -1,0 +1,77 @@
+<!-- Animated background shapes -->
+<div class="bg-shape"></div>
+<div class="bg-shape"></div>
+<div class="bg-shape"></div>
+
+<div class="login-container">
+  <div class="login-header">
+    <div class="logo-container">
+      <div class="logo">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M30 15 C25 15, 20 20, 20 25 L20 45 C20 50, 25 55, 30 55 L35 55 L35 75 C35 80, 40 85, 45 85 L55 85 C60 85, 65 80, 65 75 L65 55 L70 55 C75 55, 80 50, 80 45 L80 25 C80 20, 75 15, 70 15 L30 15 Z M35 25 L45 25 L45 45 L35 45 L35 25 Z M55 25 L65 25 L65 45 L55 45 L55 25 Z"/>
+        </svg>
+      </div>
+      <h1 class="login-title">Criollo S</h1>
+    </div>
+    <p class="login-subtitle">Inicia sesión en tu cuenta</p>
+  </div>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <input 
+        type="text" 
+        class="form-input" 
+        placeholder=" " 
+        formControlName="nombre_usuario"
+        autocomplete="username"
+        autocapitalize="off"
+        autocorrect="off"
+        spellcheck="false"
+        [class.error]="loginForm.get('nombre_usuario')?.invalid && loginForm.get('nombre_usuario')?.touched">
+      <label class="form-label">Nombre de usuario</label>
+      <div class="error-message" *ngIf="loginForm.get('nombre_usuario')?.invalid && loginForm.get('nombre_usuario')?.touched">
+        <span *ngIf="loginForm.get('nombre_usuario')?.hasError('required')">El nombre de usuario es requerido</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <input 
+        [type]="hidePassword ? 'password' : 'text'" 
+        class="form-input" 
+        placeholder=" " 
+        formControlName="password"
+        autocomplete="current-password"
+        autocapitalize="off"
+        autocorrect="off"
+        spellcheck="false"
+        [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+      <label class="form-label">Contraseña</label>
+      <button type="button" class="toggle-password" (click)="hidePassword = !hidePassword">
+        <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+      </button>
+      <div class="error-message" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+        <span *ngIf="loginForm.get('password')?.hasError('required')">La contraseña es requerida</span>
+        <span *ngIf="loginForm.get('password')?.hasError('minlength')">Mínimo 6 caracteres</span>
+      </div>
+    </div>
+
+    <div class="login-options">
+      <label class="remember-me">
+        <input type="checkbox">
+        Recordarme
+      </label>
+      <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+    </div>
+
+    <button type="submit" class="login-btn" [disabled]="loading || !loginForm.valid">
+      <span class="btn-text" *ngIf="!loading">Iniciar Sesión</span>
+      <div class="loading" *ngIf="loading">
+        <div class="spinner"></div>
+      </div>
+    </button>
+  </form>
+
+  <div class="signup-link">
+    ¿No tienes una cuenta? <a routerLink="/register">Regístrate aquí</a>
+  </div>
+</div>

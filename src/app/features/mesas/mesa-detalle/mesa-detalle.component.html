@@ -1,0 +1,110 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <div class="header-info">
+      <h2>
+        <mat-icon>table_restaurant</mat-icon>
+        {{data.mesa.nombre}}
+      </h2>
+      <span class="mesa-capacidad">
+        <mat-icon>people</mat-icon>
+        {{data.mesa.cantidad_personas}} personas
+      </span>
+    </div>
+    <button class="close-btn" (click)="cerrar()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="dialog-body">
+    <!-- Loading -->
+    <div class="loader-container" *ngIf="loading">
+      <div class="spinner"></div>
+      <p>Cargando pedido...</p>
+    </div>
+
+    <!-- Pedido -->
+    <div class="pedido-content" *ngIf="!loading && pedido">
+      <!-- Info del pedido -->
+      <div class="pedido-info">
+        <div class="info-item">
+          <mat-icon>person</mat-icon>
+          <div>
+            <span class="info-label">Mesero</span>
+            <span class="info-value">{{pedido.mesero}}</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <mat-icon>schedule</mat-icon>
+          <div>
+            <span class="info-label">Hora</span>
+            <span class="info-value">{{pedido.fecha | date:'shortTime'}}</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <mat-icon>receipt</mat-icon>
+          <div>
+            <span class="info-label">Pedido</span>
+            <span class="info-value">#{{pedido.id}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detalles del pedido -->
+      <div class="pedido-detalles">
+        <h3>Productos del Pedido</h3>
+        <div class="detalles-list">
+          <div class="detalle-item" *ngFor="let item of pedido.detalles">
+            <div class="item-cantidad">
+              <span class="cantidad-badge">{{item.cantidad}}x</span>
+            </div>
+            <div class="item-info">
+              <span class="item-nombre">{{item.producto_nombre}}</span>
+              <span class="item-notas" *ngIf="item.notas">
+                <mat-icon>note</mat-icon>
+                {{item.notas}}
+              </span>
+            </div>
+            <div class="item-precios">
+              <span class="precio-unitario">${{item.precio_unitario | number:'1.0-0'}}</span>
+              <span class="subtotal">${{item.subtotal | number:'1.0-0'}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total -->
+      <div class="pedido-total">
+        <div class="total-row subtotal-row">
+          <span>Subtotal</span>
+          <span>${{calcularTotal() | number:'1.0-0'}}</span>
+        </div>
+        <div class="total-row impuesto-row">
+          <span>IVA (19%)</span>
+          <span>${{(calcularTotal() * 0.19) | number:'1.0-0'}}</span>
+        </div>
+        <div class="total-row total-final">
+          <span>Total</span>
+          <span>${{(calcularTotal() * 1.19) | number:'1.0-0'}}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sin pedido -->
+    <div class="empty-state" *ngIf="!loading && !pedido">
+      <mat-icon>receipt_long</mat-icon>
+      <h3>No hay pedido activo</h3>
+      <p>Esta mesa no tiene un pedido en curso</p>
+    </div>
+  </div>
+
+  <div class="dialog-actions" *ngIf="!loading && pedido">
+    <button class="btn-secondary" (click)="imprimirCuenta()">
+      <mat-icon>print</mat-icon>
+      <span>Imprimir</span>
+    </button>
+    <button class="btn-primary" (click)="cerrarPedido()">
+      <mat-icon>check_circle</mat-icon>
+      <span>Cerrar Pedido</span>
+    </button>
+  </div>
+</div>

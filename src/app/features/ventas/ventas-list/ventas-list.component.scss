@@ -1,0 +1,1000 @@
+.ventas-container {
+  animation: fadeIn 0.5s ease-out;
+}
+
+// Breadcrumb
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding: 12px 0;
+  
+  .breadcrumb-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #666;
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all 0.3s;
+    
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+    
+    &:hover:not(.active) {
+      background: rgba(255, 107, 53, 0.08);
+      color: #ff6b35;
+    }
+    
+    &.active {
+      color: #ff6b35;
+      font-weight: 600;
+      background: rgba(255, 107, 53, 0.1);
+    }
+  }
+  
+  .breadcrumb-separator {
+    color: #ccc;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// Header
+.page-header {
+  margin-bottom: 30px;
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(255, 107, 53, 0.08);
+  border: 1px solid rgba(255, 107, 53, 0.1);
+  
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+    
+    .header-text {
+      flex: 1;
+      
+      .title-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        
+        .title-icon {
+          width: 70px;
+          height: 70px;
+          background: linear-gradient(135deg, #ff6b35, #f7931e);
+          border-radius: 18px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 8px 25px rgba(255, 107, 53, 0.3);
+          animation: pulse 2s ease-in-out infinite;
+          
+          mat-icon {
+            font-size: 36px;
+            width: 36px;
+            height: 36px;
+            color: white;
+          }
+        }
+        
+        .title-content {
+          flex: 1;
+          
+          h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+          }
+          
+          p {
+            margin: 0;
+            color: #666;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            
+            mat-icon {
+              font-size: 20px;
+              width: 20px;
+              height: 20px;
+              color: #ff6b35;
+            }
+          }
+        }
+      }
+    }
+    
+    .btn-nuevo {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 32px;
+      background: linear-gradient(135deg, #ff6b35 0%, #f7931e 50%, #ffab00 100%);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 8px 25px rgba(255, 107, 53, 0.35);
+      overflow: hidden;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.5s;
+      }
+      
+      &:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 12px 35px rgba(255, 107, 53, 0.45);
+        
+        &::before {
+          left: 100%;
+        }
+        
+        .btn-icon-wrapper {
+          transform: rotate(90deg) scale(1.1);
+        }
+      }
+      
+      &:active {
+        transform: translateY(-1px) scale(0.98);
+      }
+      
+      .btn-icon-wrapper {
+        width: 32px;
+        height: 32px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+        
+        mat-icon {
+          font-size: 24px;
+          width: 24px;
+          height: 24px;
+        }
+      }
+      
+      .btn-text {
+        position: relative;
+        z-index: 1;
+        letter-spacing: 0.3px;
+      }
+      
+      .btn-shine {
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transform: rotate(45deg);
+        animation: shine 3s infinite;
+      }
+    }
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes shine {
+  0% {
+    transform: rotate(45deg) translateX(-100%);
+  }
+  100% {
+    transform: rotate(45deg) translateX(100%);
+  }
+}
+
+// Estadísticas
+.stats-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+  
+  .stat-item {
+    flex: 1;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border: 1px solid rgba(255, 107, 53, 0.1);
+    transition: all 0.3s;
+    
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(255, 107, 53, 0.12);
+    }
+    
+    mat-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+    }
+    
+    &.ventas mat-icon {
+      color: #ff6b35;
+    }
+    
+    &.ingresos mat-icon {
+      color: #4caf50;
+    }
+    
+    &.efectivo mat-icon {
+      color: #2196f3;
+    }
+    
+    &.tarjeta mat-icon {
+      color: #9c27b0;
+    }
+    
+    .stat-info {
+      display: flex;
+      flex-direction: column;
+      
+      .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #333;
+      }
+      
+      .stat-label {
+        font-size: 0.85rem;
+        color: #999;
+      }
+    }
+  }
+}
+
+// Filtros
+.filters-section {
+  margin-bottom: 30px;
+  
+  .filter-chips {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    
+    .filter-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 18px;
+      background: white;
+      border: 2px solid rgba(255, 107, 53, 0.1);
+      border-radius: 12px;
+      color: #666;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+      
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+      
+      &:hover {
+        border-color: rgba(255, 107, 53, 0.3);
+        background: rgba(255, 107, 53, 0.05);
+      }
+      
+      &.active {
+        background: linear-gradient(135deg, #ff6b35, #f7931e);
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+      }
+    }
+  }
+}
+
+// Loading
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 107, 53, 0.1);
+    border-top: 4px solid #ff6b35;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  p {
+    margin-top: 20px;
+    color: #666;
+    font-size: 1.05rem;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Grid de ventas
+.ventas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.venta-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid rgba(255, 107, 53, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(255, 107, 53, 0.15);
+    border-color: rgba(255, 107, 53, 0.3);
+  }
+  
+  .venta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+    
+    .venta-numero {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #ff6b35;
+      
+      mat-icon {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+      }
+    }
+    
+    .venta-estado {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      
+      &.completada {
+        background: rgba(76, 175, 80, 0.1);
+        color: #4caf50;
+      }
+      
+      &.cancelada {
+        background: rgba(244, 67, 54, 0.1);
+        color: #f44336;
+      }
+    }
+  }
+  
+  .venta-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+    
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: #666;
+      
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        color: #999;
+      }
+      
+      &.metodo {
+        font-weight: 600;
+        
+        &.metodo-efectivo {
+          color: #2196f3;
+          
+          mat-icon {
+            color: #2196f3;
+          }
+        }
+        
+        &.metodo-tarjeta {
+          color: #9c27b0;
+          
+          mat-icon {
+            color: #9c27b0;
+          }
+        }
+        
+        &.metodo-transferencia {
+          color: #ff9800;
+          
+          mat-icon {
+            color: #ff9800;
+          }
+        }
+      }
+    }
+  }
+  
+  .venta-productos {
+    margin-bottom: 16px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    
+    h4 {
+      margin: 0 0 10px 0;
+      font-size: 0.85rem;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .producto-item {
+      display: grid;
+      grid-template-columns: 40px 1fr auto;
+      gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px solid #e0e0e0;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      .cantidad {
+        font-weight: 700;
+        color: #ff6b35;
+      }
+      
+      .nombre {
+        color: #333;
+        font-size: 0.9rem;
+      }
+      
+      .precio {
+        font-weight: 600;
+        color: #666;
+        font-size: 0.9rem;
+      }
+    }
+    
+    .ver-mas {
+      display: block;
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: #ff6b35;
+      font-weight: 600;
+    }
+  }
+  
+  .venta-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+    
+    .venta-total {
+      display: flex;
+      flex-direction: column;
+      
+      .total-label {
+        font-size: 0.75rem;
+        color: #999;
+        margin-bottom: 4px;
+      }
+      
+      .total-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #ff6b35;
+      }
+    }
+    
+    .venta-actions {
+      display: flex;
+      gap: 8px;
+      
+      .btn-action {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+        
+        mat-icon {
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
+        
+        &.view {
+          background: rgba(33, 150, 243, 0.1);
+          color: #2196f3;
+          
+          &:hover {
+            background: #2196f3;
+            color: white;
+            transform: scale(1.1);
+          }
+        }
+        
+        &.print {
+          background: rgba(156, 39, 176, 0.1);
+          color: #9c27b0;
+          
+          &:hover {
+            background: #9c27b0;
+            color: white;
+            transform: scale(1.1);
+          }
+        }
+      }
+    }
+  }
+}
+
+// Empty state
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  animation: fadeIn 0.6s ease-out;
+  
+  .empty-icon {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 24px;
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(247, 147, 30, 0.1));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    mat-icon {
+      font-size: 64px;
+      width: 64px;
+      height: 64px;
+      color: #ff6b35;
+    }
+  }
+  
+  h3 {
+    margin: 0 0 12px 0;
+    font-size: 1.5rem;
+    color: #333;
+  }
+  
+  p {
+    margin: 0 0 24px 0;
+    color: #666;
+    font-size: 1.05rem;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Tablet
+@media (max-width: 1024px) {
+  .ventas-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+// Móvil grande
+@media (max-width: 768px) {
+  .breadcrumb {
+    padding: 12px 16px;
+    font-size: 0.85rem;
+  }
+  
+  .page-header {
+    padding: 20px 16px;
+    
+    .header-content {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+      
+      .header-text {
+        .title-wrapper {
+          .title-icon {
+            width: 50px;
+            height: 50px;
+            
+            mat-icon {
+              font-size: 28px;
+              width: 28px;
+              height: 28px;
+            }
+          }
+          
+          .title-content {
+            h1 {
+              font-size: 1.5rem;
+            }
+            
+            p {
+              font-size: 0.85rem;
+            }
+          }
+        }
+      }
+      
+      .btn-nuevo {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+  
+  .stats-row {
+    flex-direction: column;
+    gap: 12px;
+    padding: 0 16px;
+    margin-bottom: 20px;
+    
+    .stat-item {
+      padding: 14px;
+      
+      mat-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+      }
+      
+      .stat-info {
+        .stat-value {
+          font-size: 1.3rem;
+        }
+        
+        .stat-label {
+          font-size: 0.8rem;
+        }
+      }
+    }
+  }
+  
+  .filters-section {
+    padding: 0 16px;
+    margin-bottom: 20px;
+    
+    .filter-chips {
+      flex-wrap: wrap;
+      gap: 8px;
+      
+      .filter-chip {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+      }
+    }
+  }
+  
+  .ventas-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 0 16px;
+    
+    .venta-card {
+      .venta-header {
+        padding: 14px;
+        
+        .venta-id {
+          font-size: 1rem;
+        }
+        
+        .venta-fecha {
+          font-size: 0.75rem;
+        }
+      }
+      
+      .venta-body {
+        padding: 14px;
+        
+        .venta-info {
+          .info-item {
+            font-size: 0.85rem;
+            
+            mat-icon {
+              font-size: 18px;
+              width: 18px;
+              height: 18px;
+            }
+          }
+        }
+        
+        .venta-productos {
+          .producto-item {
+            padding: 8px;
+            font-size: 0.85rem;
+          }
+        }
+      }
+      
+      .venta-footer {
+        padding: 12px 14px;
+        
+        .venta-total {
+          font-size: 0.85rem;
+          
+          .total-value {
+            font-size: 1.2rem;
+          }
+        }
+        
+        .venta-actions {
+          gap: 8px;
+          
+          button {
+            padding: 8px;
+            
+            mat-icon {
+              font-size: 18px;
+              width: 18px;
+              height: 18px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Móvil pequeño
+@media (max-width: 480px) {
+  .breadcrumb {
+    padding: 10px 12px;
+    font-size: 0.8rem;
+  }
+  
+  .page-header {
+    padding: 16px 12px;
+    
+    .header-content {
+      gap: 12px;
+      
+      .header-text {
+        .title-wrapper {
+          gap: 12px;
+          
+          .title-icon {
+            width: 45px;
+            height: 45px;
+            
+            mat-icon {
+              font-size: 24px;
+              width: 24px;
+              height: 24px;
+            }
+          }
+          
+          .title-content {
+            h1 {
+              font-size: 1.3rem;
+            }
+            
+            p {
+              font-size: 0.8rem;
+            }
+          }
+        }
+      }
+      
+      .btn-nuevo {
+        padding: 12px 20px;
+        font-size: 0.9rem;
+      }
+    }
+  }
+  
+  .stats-row {
+    padding: 0 12px;
+    gap: 10px;
+    
+    .stat-item {
+      padding: 12px;
+      
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+      
+      .stat-info {
+        .stat-value {
+          font-size: 1.2rem;
+        }
+        
+        .stat-label {
+          font-size: 0.75rem;
+        }
+      }
+    }
+  }
+  
+  .filters-section {
+    padding: 0 12px;
+    
+    .filter-chips {
+      gap: 6px;
+      
+      .filter-chip {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+      }
+    }
+  }
+  
+  .ventas-grid {
+    padding: 0 12px;
+    gap: 12px;
+    
+    .venta-card {
+      .venta-header {
+        padding: 12px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        
+        .venta-id {
+          font-size: 0.95rem;
+        }
+        
+        .venta-fecha {
+          font-size: 0.7rem;
+        }
+      }
+      
+      .venta-body {
+        padding: 12px;
+        
+        .venta-info {
+          gap: 8px;
+          
+          .info-item {
+            padding: 8px;
+            font-size: 0.8rem;
+            
+            mat-icon {
+              font-size: 16px;
+              width: 16px;
+              height: 16px;
+            }
+          }
+        }
+        
+        .venta-productos {
+          .producto-item {
+            padding: 6px;
+            font-size: 0.8rem;
+          }
+        }
+      }
+      
+      .venta-footer {
+        padding: 10px 12px;
+        flex-direction: column;
+        gap: 12px;
+        
+        .venta-total {
+          font-size: 0.8rem;
+          width: 100%;
+          
+          .total-value {
+            font-size: 1.1rem;
+          }
+        }
+        
+        .venta-actions {
+          width: 100%;
+          justify-content: stretch;
+          gap: 8px;
+          
+          button {
+            flex: 1;
+            padding: 10px;
+            
+            mat-icon {
+              font-size: 18px;
+              width: 18px;
+              height: 18px;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .empty-state {
+    padding: 40px 12px;
+    
+    mat-icon {
+      font-size: 60px;
+      width: 60px;
+      height: 60px;
+    }
+    
+    h3 {
+      font-size: 1.1rem;
+    }
+    
+    p {
+      font-size: 0.85rem;
+    }
+  }
+}

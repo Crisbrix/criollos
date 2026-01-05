@@ -1,0 +1,196 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2>
+      <mat-icon>point_of_sale</mat-icon>
+      Nueva Venta
+    </h2>
+    <button class="close-btn" (click)="cancelar()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="dialog-body">
+    <!-- Paso 1: Seleccionar Pedido -->
+    <div class="paso-pedidos" *ngIf="!pedidoSeleccionado">
+      <div class="paso-header">
+        <h3>Selecciona un Pedido para Cobrar</h3>
+        <p>Elige el pedido que deseas convertir en venta</p>
+      </div>
+
+      <div class="pedidos-list" *ngIf="!loading && pedidos.length > 0">
+        <div 
+          class="pedido-card" 
+          *ngFor="let pedido of pedidos"
+          (click)="seleccionarPedido(pedido)">
+          <div class="pedido-header">
+            <div class="mesa-badge">
+              <mat-icon>table_restaurant</mat-icon>
+              <span>{{pedido.mesa_nombre || 'Mesa ' + pedido.mesa_id}}</span>
+            </div>
+            <div class="pedido-total">
+              ${{pedido.total | number:'1.0-0'}}
+            </div>
+          </div>
+          <div class="pedido-items">
+            <div class="item" *ngFor="let detalle of pedido.detalles.slice(0, 3)">
+              <span class="cantidad">{{detalle.cantidad}}x</span>
+              <span class="nombre">{{detalle.producto_nombre}}</span>
+            </div>
+            <span class="ver-mas" *ngIf="pedido.detalles.length > 3">
+              +{{pedido.detalles.length - 3}} más...
+            </span>
+          </div>
+          <div class="pedido-action">
+            <mat-icon>arrow_forward</mat-icon>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="!loading && pedidos.length === 0">
+        <mat-icon>receipt_long</mat-icon>
+        <h3>No hay pedidos listos para cobrar</h3>
+        <p>Los pedidos marcados como "Listo" aparecerán aquí</p>
+      </div>
+
+      <div class="loader" *ngIf="loading">
+        <div class="spinner"></div>
+        <p>Cargando pedidos...</p>
+      </div>
+    </div>
+
+    <!-- Paso 2: Confirmar Venta -->
+    <form *ngIf="pedidoSeleccionado" #ventaForm="ngForm">
+      <button type="button" class="btn-volver" (click)="pedidoSeleccionado = null">
+        <mat-icon>arrow_back</mat-icon>
+        <span>Cambiar Pedido</span>
+      </button>
+
+      <!-- Resumen del pedido -->
+      <div class="pedido-resumen">
+        <h3>Resumen del Pedido</h3>
+        <div class="resumen-header">
+          <div class="mesa-info">
+            <mat-icon>table_restaurant</mat-icon>
+            <span>{{pedidoSeleccionado.mesa_nombre || 'Mesa ' + pedidoSeleccionado.mesa_id}}</span>
+          </div>
+        </div>
+
+        <div class="resumen-productos">
+          <div class="producto-item" *ngFor="let detalle of pedidoSeleccionado.detalles">
+            <span class="cantidad">{{detalle.cantidad}}x</span>
+            <span class="nombre">{{detalle.producto_nombre}}</span>
+            <span class="precio">${{detalle.cantidad * detalle.precio_unitario | number:'1.0-0'}}</span>
+          </div>
+        </div>
+
+        <div class="resumen-total">
+          <span>Total a Cobrar:</span>
+          <span class="total-value">${{pedidoSeleccionado.total | number:'1.0-0'}}</span>
+        </div>
+      </div>
+
+      <!-- Método de pago -->
+      <div class="form-group">
+        <label>Método de Pago *</label>
+        <div class="metodos-pago">
+          <label class="metodo-option" [class.selected]="metodo_pago === 'efectivo'">
+            <input type="radio" [(ngModel)]="metodo_pago" name="metodo_pago" value="efectivo">
+            <div class="option-content">
+              <mat-icon>money</mat-icon>
+              <span>Efectivo</span>
+            </div>
+          </label>
+
+          <label class="metodo-option" [class.selected]="metodo_pago === 'tarjeta'">
+            <input type="radio" [(ngModel)]="metodo_pago" name="metodo_pago" value="tarjeta">
+            <div class="option-content">
+              <mat-icon>credit_card</mat-icon>
+              <span>Tarjeta</span>
+            </div>
+          </label>
+
+          <label class="metodo-option" [class.selected]="metodo_pago === 'transferencia'">
+            <input type="radio" [(ngModel)]="metodo_pago" name="metodo_pago" value="transferencia">
+            <div class="option-content">
+              <mat-icon>account_balance</mat-icon>
+              <span>Transferencia</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Monto recibido (solo para efectivo) -->
+      <div class="form-group" *ngIf="metodo_pago === 'efectivo'">
+        <label>Monto Recibido *</label>
+        <div class="input-wrapper">
+          <mat-icon>attach_money</mat-icon>
+          <input 
+            type="number" 
+            placeholder="¿Con cuánto paga el cliente?" 
+            [(ngModel)]="montoRecibido" 
+            name="montoRecibido"
+            (ngModelChange)="calcularCambio()"
+            min="0"
+            step="1000"
+            autofocus
+            required>
+        </div>
+
+        <!-- Botones rápidos de montos -->
+        <div class="montos-rapidos" *ngIf="pedidoSeleccionado">
+          <button type="button" class="monto-btn" (click)="montoRecibido = pedidoSeleccionado.total; calcularCambio()">
+            Exacto
+          </button>
+          <button type="button" class="monto-btn" (click)="montoRecibido = 10000; calcularCambio()">
+            $10,000
+          </button>
+          <button type="button" class="monto-btn" (click)="montoRecibido = 20000; calcularCambio()">
+            $20,000
+          </button>
+          <button type="button" class="monto-btn" (click)="montoRecibido = 50000; calcularCambio()">
+            $50,000
+          </button>
+          <button type="button" class="monto-btn" (click)="montoRecibido = 100000; calcularCambio()">
+            $100,000
+          </button>
+        </div>
+        
+        <!-- Cambio -->
+        <div class="cambio-info" *ngIf="montoRecibido && montoRecibido > 0">
+          <div class="cambio-label">Cambio a devolver:</div>
+          <div class="cambio-value" [class.error]="getCambio() < 0">
+            ${{getCambio() | number:'1.0-0'}}
+          </div>
+          <div class="cambio-warning" *ngIf="getCambio() < 0">
+            ⚠️ El monto recibido es insuficiente
+          </div>
+        </div>
+      </div>
+
+      <!-- Observaciones -->
+      <div class="form-group">
+        <label>Observaciones</label>
+        <div class="input-wrapper">
+          <mat-icon>note</mat-icon>
+          <textarea 
+            placeholder="Observaciones de la venta" 
+            [(ngModel)]="observaciones" 
+            name="observaciones" 
+            rows="2">
+          </textarea>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="dialog-actions" *ngIf="pedidoSeleccionado">
+    <button class="btn-cancel" (click)="cancelar()" [disabled]="loading">
+      <mat-icon>close</mat-icon>
+      <span>Cancelar</span>
+    </button>
+    <button class="btn-save" (click)="crearVenta()" [disabled]="loading">
+      <mat-icon>check</mat-icon>
+      <span>{{ loading ? 'Procesando...' : 'Cobrar Venta' }}</span>
+    </button>
+  </div>
+</div>
