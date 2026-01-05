@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://criollos-backend.vercel.app/api'
+  apiUrl: 'https://cback-blush.vercel.app/api'
 };
