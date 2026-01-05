@@ -59,7 +59,8 @@
               "optimization": true,
               "sourceMap": false,
               "namedChunks": false,
-              "extractLicenses": true
+              "extractLicenses": true,
+              "baseHref": "/"
             },
             "development": {
               "optimization": false,
